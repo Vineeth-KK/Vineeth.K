@@ -1,34 +1,28 @@
 "use client";
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import Link from "next/link";
 import styles from "./style.module.scss";
-import { opacity, background } from "./anim";
-import Nav from "./nav";
 import { cn } from "@/lib/utils";
-import FunnyThemeToggle from "../theme/funny-theme-toggle";
 import { Button } from "../ui/button";
 import { config } from "@/data/config";
-import OnlineUsers from "../realtime/online-users";
-import { GitHubStarsButton } from "../ui/shadcn-io/github-stars-button";
+import { links } from "./config";
+import { useState } from "react";
+import { Menu, X } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
 
 interface HeaderProps {
   loader?: boolean;
 }
 
 const Header = ({ loader }: HeaderProps) => {
-  const [isActive, setIsActive] = useState<boolean>(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   return (
     <motion.header
       className={cn(
         styles.header,
-        "transition-colors delay-100 duration-500 ease-in z-[1000]"
+        "transition-colors delay-100 duration-500 ease-in z-[1000] bg-background/80 backdrop-blur-md"
       )}
-      style={{
-        background: isActive ? "hsl(var(--background) / .8)" : "transparent",
-        // backgroundImage:
-        //   "linear-gradient(0deg, rgba(0, 0, 0, 0), rgb(0, 0, 0))",
-      }}
       initial={{
         y: -80,
       }}
@@ -36,66 +30,66 @@ const Header = ({ loader }: HeaderProps) => {
         y: 0,
       }}
       transition={{
-        delay: loader ? 3.5 : 0, // 3.5 for loading, .5 can be added for delay
+        delay: loader ? 3.5 : 0,
         duration: 0.8,
       }}
     >
-      {/* <div
-        className="absolute inset-0 "
-        style={{
-          mask: "linear-gradient(rgb(0, 0, 0) 0%, rgba(0, 0, 0, 0) 12.5%)",
-        }}
-      >
-      </div> */}
-      <div className={cn(styles.bar, "flex items-center justify-between")}>
-        <Link href="/" className="flex items-center justify-center">
-          <Button variant={"link"} className="text-md">
+      <div className="flex items-center justify-between w-full h-full max-w-7xl mx-auto px-4">
+        <Link href="/" className="flex items-center justify-center shrink-0">
+          <Button variant={"link"} className="text-md px-0">
             {config.author}
           </Button>
         </Link>
 
-        <FunnyThemeToggle className="w-6 h-6 mr-4 hidden md:flex" />
-        <OnlineUsers />
-        {config.githubUsername && config.githubRepo && (
-          <GitHubStarsButton
-            username={config.githubUsername}
-            repo={config.githubRepo}
-            className="mr-4"
-          />
-        )}
-        <Button
-          variant={"ghost"}
-          onClick={() => setIsActive(!isActive)}
-          className={cn(
-            styles.el,
-            "m-0 p-0 h-6 bg-transparent flex items-center justify-center"
-          )}
-        >
-          <div className="relative hidden md:flex items-center">
-            <motion.p
-              variants={opacity}
-              animate={!isActive ? "open" : "closed"}
-            >
-              Menu
-            </motion.p>
-            <motion.p variants={opacity} animate={isActive ? "open" : "closed"}>
-              Close
-            </motion.p>
-          </div>
-          <div
-            className={`${styles.burger} ${isActive ? styles.burgerActive : ""
-              }`}
-          ></div>
-        </Button>
+        {/* Desktop Navigation */}
+        <nav className="hidden lg:flex items-center gap-1 xl:gap-2 absolute left-1/2 -translate-x-1/2">
+          {links.map((link) => (
+            <Link key={link.title} href={link.href}>
+              <Button variant="ghost" className="text-sm px-2 xl:px-4">
+                {link.title}
+              </Button>
+            </Link>
+          ))}
+        </nav>
+
+        {/* Since we removed right-side elements, we can add a placeholder to keep centering for absolute left-1/2, or just rely on justify-between. 
+            Because nav is absolute positioned in the center, it doesn't matter much. But we need a div on the right to balance justify-between if needed. 
+            Actually justify-between only spaces the flex items. Since nav is absolute, the mobile menu button is the other flex item on right. */}
+
+        {/* Mobile menu button */}
+        <div className="flex items-center gap-2 lg:hidden ml-auto">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </Button>
+        </div>
       </div>
-      <motion.div
-        variants={background}
-        initial="initial"
-        animate={isActive ? "open" : "closed"}
-        className={styles.background}
-      ></motion.div>
-      <AnimatePresence mode="wait">
-        {isActive && <Nav setIsActive={setIsActive} />}
+
+      {/* Mobile Navigation */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="absolute top-16 left-0 w-full bg-background border-b border-border shadow-lg p-4 flex flex-col gap-2 lg:hidden z-50 max-h-[80vh] overflow-y-auto"
+          >
+            {links.map((link) => (
+              <Link
+                key={link.title}
+                href={link.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <Button variant="ghost" className="w-full justify-start text-sm">
+                  {link.title}
+                </Button>
+              </Link>
+            ))}
+          </motion.div>
+        )}
       </AnimatePresence>
     </motion.header>
   );
