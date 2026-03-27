@@ -116,16 +116,16 @@ const AnimatedBackground = () => {
         onEnter: () => {
           setActiveSection(targetSection);
           const state = getKeyboardState({ section: targetSection, isMobile });
-          gsap.to(kbd.scale, { ...state.scale, duration: 1 });
-          gsap.to(kbd.position, { ...state.position, duration: 1 });
-          gsap.to(kbd.rotation, { ...state.rotation, duration: 1 });
+          gsap.to(kbd.scale, { ...state.scale, duration: 1, overwrite: "auto" });
+          gsap.to(kbd.position, { ...state.position, duration: 1, overwrite: "auto" });
+          gsap.to(kbd.rotation, { ...state.rotation, duration: 1, overwrite: "auto" });
         },
         onLeaveBack: () => {
           setActiveSection(prevSection);
           const state = getKeyboardState({ section: prevSection, isMobile, });
-          gsap.to(kbd.scale, { ...state.scale, duration: 1 });
-          gsap.to(kbd.position, { ...state.position, duration: 1 });
-          gsap.to(kbd.rotation, { ...state.rotation, duration: 1 });
+          gsap.to(kbd.scale, { ...state.scale, duration: 1, overwrite: "auto" });
+          gsap.to(kbd.position, { ...state.position, duration: 1, overwrite: "auto" });
+          gsap.to(kbd.rotation, { ...state.rotation, duration: 1, overwrite: "auto" });
         },
       },
     });
@@ -418,8 +418,8 @@ const AnimatedBackground = () => {
 
   // Reveal keyboard on load/route change
   useEffect(() => {
-    const hash = activeSection === "hero" ? "#" : `#${activeSection}`;
-    router.push("/" + hash, { scroll: false });
+    const hash = activeSection === "hero" ? "" : `#${activeSection}`;
+    window.history.replaceState(null, "", "/" + hash);
 
     if (!splineApp || isLoading || keyboardRevealed) return;
     updateKeyboardTransform();

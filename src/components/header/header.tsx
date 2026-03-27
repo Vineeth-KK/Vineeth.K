@@ -9,6 +9,7 @@ import { links } from "./config";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
+import FunnyThemeToggle from "../theme/funny-theme-toggle";
 
 interface HeaderProps {
   loader?: boolean;
@@ -56,11 +57,15 @@ const Header = ({ loader }: HeaderProps) => {
             Because nav is absolute positioned in the center, it doesn't matter much. But we need a div on the right to balance justify-between if needed. 
             Actually justify-between only spaces the flex items. Since nav is absolute, the mobile menu button is the other flex item on right. */}
 
-        {/* Mobile menu button */}
-        <div className="flex items-center gap-2 lg:hidden ml-auto">
+        {/* Right side elements */}
+        <div className="flex items-center gap-2 ml-auto">
+          <FunnyThemeToggle />
+          
+          {/* Mobile menu button */}
           <Button
             variant="ghost"
             size="icon"
+            className="lg:hidden"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
